@@ -1,0 +1,77 @@
+MgDyn2D:
+  Equation: MgDyn2D
+  Variable: Potential
+  Procedure: '"MagnetoDynamics2D" "MagnetoDynamics2D"'
+  Exec Solver: Always
+  Optimize Bandwidth: True
+  Steady State Convergence Tolerance: 1.0e-5
+  Nonlinear System Convergence Tolerance: 1.0e-7
+  Nonlinear System Max Iterations: 50
+  Nonlinear System Newton After Iterations: 50
+  Nonlinear System Newton After Tolerance: 0.001
+  Nonlinear System Relaxation Factor: 0.7
+  Linear System Solver: Iterative
+  Linear System Iterative Method: BiCGStabl
+  Linear System Max Iterations: 500
+  Linear System Convergence Tolerance: 1.0e-8
+  BiCGstabl polynomial degree: 4
+  Linear System Preconditioning: ILU0
+  Linear System Abort Not Converged: False
+  Linear System Residual Output: 10
+
+MgDynPost:
+  Equation: MgDynPost
+  Procedure: '"MagnetoDynamics" "MagnetoDynamicsCalcFields"'
+  Target Variable: Potential
+  Exec Solver: Always
+  Steady State Convergence Tolerance: 1.0e-5
+  Linear System Solver: Iterative
+  Linear System Iterative Method: BiCGStabl
+  Linear System Max Iterations: 500
+  Linear System Convergence Tolerance: 1.0e-8
+  BiCGstabl polynomial degree: 4
+  Linear System Preconditioning: ILU0
+  Calculate Magnetic Field Strength: Logical True
+  Calculate Magnetic Flux Density: Logical True
+  Calculate Current Density: Logical True
+
+ResultOutput:
+  Exec Solver: After All
+  Equation: '"ResultOutput"'
+  Procedure: '"ResultOutputSolve" "ResultOutputSolver"'
+  Output Directory: '"result/paraview"'
+  Output File Name: '"results"'
+  Vtu Format: Logical True
+  Vtu Part Collection: Logical True
+  Vtu Multiblock: Logical True
+
+SaveLine:
+  Equation: SaveLine
+  Procedure: '"SaveData" "SaveLine"'
+  Filename: '"result/plot/linha_fluxo.dat"'
+  File Append: Logical False
+  Polyline Coordinates(2,2): Real -0.14 0.0  0.14 0.0
+  Polyline Divisions(1) : 1200
+
+
+SaveScalars:
+  Equation: '"SaveScalars"'
+  Procedure: '"SaveData" "SaveScalars"'
+  Filename: '"result/scalar/integrais_bobina.dat"'
+  Save Component Results: Logical True
+  Exec Solver: After timestep
+  # ! 1. Eixo X: Salvar o Tempo da simulação
+  Variable 1: Time
+  # ! 2. Eixo Y (Opcional): Salvar a Corrente para conferir o MATC
+  Variable 2: Current Density 3
+  Operator 2: body mean
+  Mask Name 2: '"Integral Area"' 
+  # ! 3. Mantendo sua checagem de área (será constante)
+  Variable 3: Potential
+  Operator 3: body volume
+  Mask Name 3: '"Integral Area"'
+  # ! 4. A integral do fluxo (agora pulsará no tempo!)
+  Variable 4: Potential
+  Operator 4: body int
+  Mask Name 4: '"Integral Potencial"'
+  

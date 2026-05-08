@@ -1,0 +1,5 @@
+*.FCBak
+sim/
+mesh/
+*.pyc
+.vscode/
